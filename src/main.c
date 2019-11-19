@@ -21,4 +21,4 @@ int main(int argc, char const *argv[]) {
 }
 
 // Check memory leak
-// valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt ./tp2 datasets/exemplo1.txt 
+// valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt ./tp3 datasets/221.txt 

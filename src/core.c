@@ -44,6 +44,117 @@ void printAllInformations (int N, int I, int J, int **data) {
     }
 }
 
+void pringGraph(Sudoku *s) {
+    int size = s->N * s->N, i;
+    Item *begin;
+    Item *end;
+    Item *it;
+
+    for (i = 0; i < size; i++) {
+        begin = s->adjacencyList[i].inicio->prox;
+        end = s->adjacencyList[i].fim;
+
+        for (it = begin; ; it = it->prox) {
+            printf("%d ", it->item);
+            if (it == end) {
+                break;
+            }
+        }
+        printf("\n");
+    }
+}
+
+void makeEmptyGraph (Sudoku *s, int N, int I, int J, int **data) {
+    int i, j;
+    s->N = N;
+    s->I = I;
+    s->J = J;
+
+    s->possibilities = (Lista*) malloc((N * N) * sizeof(Lista));
+    s->adjacencyList = (Lista*) malloc((N * N) * sizeof(Lista));
+    for (i = 0; i < N * N; i++) {
+        makeEmptyList(&s->possibilities[i]);
+        makeEmptyList(&s->adjacencyList[i]);
+    }
+    s->data = (int*) calloc(N * N, sizeof(int));
+
+    insertEdges(s, N);
+    setGrids(s, N, I, J);
+
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            insertValues(s, i, j, data[i][j], N);
+        }
+    }
+}
+
+void insertValues (Sudoku *s, int row, int column, int value, int N) {
+    int position = row * N + column;
+
+    Item *begin = s->adjacencyList[position].inicio;
+    Item *end = s->adjacencyList[position].fim;
+    
+    s->data[position] = value;
+    
+    if(value != 0) {
+        Item *it;
+        for (it = begin; it != end; it = it->prox) {
+            // Only add non-repetitive numbers
+            if (!findItem(&s->possibilities[it->item], value)) {
+                addItemEnd(&s->possibilities[it->item], value);
+            }
+        }
+    }
+}
+
+void insertEdges (Sudoku *s, int N) {
+    int i, size = N * N;
+    for (i = 0; i < size; i++) {
+        int actualLine = (i / N), column;
+        for (column = (i % N) + 1; column < N; column++) {
+            addItemEnd(&s->adjacencyList[i], actualLine * N + column);
+            addItemEnd(&s->adjacencyList[actualLine * N + column], i);
+        }
+
+        int actualColumn = (i % N), line;
+        for (line = (i / N) + 1; line < N; line++) {
+            addItemEnd(&s->adjacencyList[i], line * N + actualColumn);
+            addItemEnd(&s->adjacencyList[line * N + actualColumn], i);
+        }
+    }
+}
+
+void setGrids(Sudoku *s, int N, int I, int J) {
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            int source = i * N + j;
+            for(int line = i + 1; (line < N) && (line % J != 0); line++) {
+                for(int column = 0; column < I; column++) {
+                    column += (j / I) * I;
+                    int destiny = line * N + column;
+                    if(j % I != column % I) {
+                        addItemEnd(&s->adjacencyList[source], destiny);
+                        addItemEnd(&s->adjacencyList[destiny], source);
+                    }
+                    column -= (j / I) * I;
+                }
+            }
+        }
+    }
+}
+
+void freeGraph (Sudoku *s) {
+    int i, size = s->N * s->N;
+    for (i = 0; i < size ; i++) {
+        freeList(&s->possibilities[i]);
+        freeList(&s->adjacencyList[i]);
+    }
+
+    free(s->data);
+    freeList(s->possibilities);
+    freeList(s->adjacencyList);
+}
+
 void initProgram (FILE *file) {
     // Read data:
     // N -> Size NXN
@@ -90,8 +201,11 @@ void initProgram (FILE *file) {
 
     printAllInformations(N, I, J, data);
 
-    // Fill structures and find solutions
-    // TODO: fill structure
+    // Fill structures
+    Sudoku s;
+    makeEmptyGraph(&s, N, I, J, data);
+    printf("------------------------------------\n");
+    pringGraph(&s);
 
     // Algorithm to calc time execution: 
     // double executionTime[N_TESTS];
@@ -108,10 +222,13 @@ void initProgram (FILE *file) {
     // }
 
 
+    // TODO: print answer
+
     // calcAndSaveTests(executionTime, M);
 
     // Free memory
     for (i = 0; i < N; i++)
         free(data[i]);
     free(data);
+    freeGraph(&s);
 }
