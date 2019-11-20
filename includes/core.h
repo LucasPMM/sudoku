@@ -5,7 +5,7 @@ typedef struct {
     int N;
     int I;
     int J;
-    Lista *possibilities;
+    Lista *notPossible;
     Lista *adjacencyList;
 } Sudoku;
 

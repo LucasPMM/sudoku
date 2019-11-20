@@ -44,24 +44,53 @@ void printAllInformations (int N, int I, int J, int **data) {
     }
 }
 
+void printSudoku(Sudoku *s) {
+    int i, j;
+    for (i = 0; i < s->N; i++) {
+        for (j = 0; j < s->N; j++) {
+            printf("%d ", s->data[i * s->N + j]);
+        }
+        printf("\n");
+    }
+}
+
 void pringGraph(Sudoku *s) {
     int size = s->N * s->N, i;
     Item *begin;
     Item *end;
     Item *it;
 
+    // Print adjacency List
     for (i = 0; i < size; i++) {
         begin = s->adjacencyList[i].inicio->prox;
         end = s->adjacencyList[i].fim;
 
         for (it = begin; ; it = it->prox) {
             printf("%d ", it->item);
-            if (it == end) {
-                break;
-            }
+            if (it == end) { break; }
         }
         printf("\n");
     }
+    printf("----------------------------------\n");
+
+    // Print possibilities List
+    for (i = 0; i < size; i++) {
+        begin = s->notPossible[i].inicio->prox;
+        end = s->notPossible[i].fim;
+
+        for (it = begin; ; it = it->prox) {
+            printf("%d ", it->item);
+            if (it == end) { break; }
+        }
+        printf("\n");
+    }
+    printf("----------------------------------\n");
+
+    // Print data
+    for (i = 0; i < size; i++) {
+        printf("%d ", s->data[i]);
+    }
+    printf("\n");
 }
 
 void makeEmptyGraph (Sudoku *s, int N, int I, int J, int **data) {
@@ -70,10 +99,10 @@ void makeEmptyGraph (Sudoku *s, int N, int I, int J, int **data) {
     s->I = I;
     s->J = J;
 
-    s->possibilities = (Lista*) malloc((N * N) * sizeof(Lista));
+    s->notPossible = (Lista*) malloc((N * N) * sizeof(Lista));
     s->adjacencyList = (Lista*) malloc((N * N) * sizeof(Lista));
     for (i = 0; i < N * N; i++) {
-        makeEmptyList(&s->possibilities[i]);
+        makeEmptyList(&s->notPossible[i]);
         makeEmptyList(&s->adjacencyList[i]);
     }
     s->data = (int*) calloc(N * N, sizeof(int));
@@ -91,18 +120,21 @@ void makeEmptyGraph (Sudoku *s, int N, int I, int J, int **data) {
 void insertValues (Sudoku *s, int row, int column, int value, int N) {
     int position = row * N + column;
 
-    Item *begin = s->adjacencyList[position].inicio;
+    Item *begin = s->adjacencyList[position].inicio->prox;
     Item *end = s->adjacencyList[position].fim;
     
     s->data[position] = value;
     
     if(value != 0) {
         Item *it;
-        for (it = begin; it != end; it = it->prox) {
+        for (it = begin;  ; it = it->prox) {
             // Only add non-repetitive numbers
-            if (!findItem(&s->possibilities[it->item], value)) {
-                addItemEnd(&s->possibilities[it->item], value);
+            Item *item = findItem(&s->notPossible[it->item], value);
+            if (item == NULL) {
+                addItemOrdered(&s->notPossible[it->item], value);
+                s->notPossible[it->item].size++;
             }
+            if (it == end) { break; }
         }
     }
 }
@@ -143,15 +175,106 @@ void setGrids(Sudoku *s, int N, int I, int J) {
     }
 }
 
+void calcSudoku (Sudoku *s) {
+    int size = s->N * s->N, i;
+    int max_probable_vertex, max_probable;
+    int possible_solution, sudoku_complete;
+    int count = 0;
+    while(1) {
+        // printf("---INICIO---\n");
+        count ++;
+        max_probable_vertex = 0;
+        max_probable = 0;
+        possible_solution = 0;
+        sudoku_complete = 1;
+
+        for (i = 0; i < size; i++) {
+            if(s->data[i] == 0) {
+                sudoku_complete = 0;
+                break;
+            }
+        }
+
+        if(sudoku_complete) {
+            printf("solução\n");
+            printSudoku(s);
+            return;
+        }
+
+        for (i = 0; i < size; i++) {
+            if (s->notPossible[i].size > max_probable && s->data[i] == 0) {
+                max_probable_vertex = i;
+                max_probable = s->notPossible[i].size;
+            }
+        }
+        for (i = 1; i <= s->N; i++) {
+            int colour_possible = 1;
+            Item *item = findItem(&s->notPossible[max_probable_vertex], i);
+            
+            
+            
+            // printf("tentando encontrar o item %d no set na pos %d\n", i, max_probable_vertex);
+            // printf("-------------------------\n");
+            // int k;
+            // Item *begin;
+            // Item *end;
+            // Item *it;
+            // for (k = 0; k < size; k++) {
+            //     begin = s->notPossible[k].inicio->prox;
+            //     end = s->notPossible[k].fim;
+
+            //     for (it = begin; ; it = it->prox) {
+            //         printf("%d ", it->item);
+            //         if (it == end) { break; }
+            //     }
+            //     printf("\n");
+            // }
+            // printf("-------------------------\n");
+
+
+
+            if(item != NULL) {
+                colour_possible = 0;
+                // printf("entrei 1\n");
+            }
+            
+            if (colour_possible) {
+                // printf("entrei 2\n");
+                possible_solution = 1;
+                s->data[max_probable_vertex] = i;
+        
+                Item *it;
+
+                for (it = s->adjacencyList[max_probable_vertex].inicio->prox ; ; it = it->prox) {
+                    Item *possible = findItem(&s->notPossible[it->item], i);
+                    if (possible == NULL) {
+                        addItemOrdered(&s->notPossible[it->item], i);
+                        s->notPossible[it->item].size++;
+                    }
+                    if (it == s->adjacencyList[max_probable_vertex].fim) { break; }
+                }
+                break;
+            }
+        }
+
+        if (possible_solution == 0) {
+            printf("sem solução\n");
+            printSudoku(s);
+            return;
+        }
+    }
+
+}
+
 void freeGraph (Sudoku *s) {
     int i, size = s->N * s->N;
     for (i = 0; i < size ; i++) {
-        freeList(&s->possibilities[i]);
+        freeList(&s->notPossible[i]);
         freeList(&s->adjacencyList[i]);
     }
 
     free(s->data);
-    freeList(s->possibilities);
+    freeList(s->notPossible);
     freeList(s->adjacencyList);
 }
 
@@ -204,8 +327,9 @@ void initProgram (FILE *file) {
     // Fill structures
     Sudoku s;
     makeEmptyGraph(&s, N, I, J, data);
-    printf("------------------------------------\n");
+    printf("---------------------------------------------\n");
     pringGraph(&s);
+    printf("---------------------------------------------\n");
 
     // Algorithm to calc time execution: 
     // double executionTime[N_TESTS];
@@ -215,14 +339,12 @@ void initProgram (FILE *file) {
     //     clock_t tempoFinal;
     //     tempoInicial = clock();
 
-        // TODO: calc answer
+        calcSudoku(&s);
        
     //     tempoFinal = clock();
     //     executionTime[clk] = (tempoFinal- tempoInicial) * 1000.0 / CLOCKS_PER_SEC;
     // }
 
-
-    // TODO: print answer
 
     // calcAndSaveTests(executionTime, M);
 

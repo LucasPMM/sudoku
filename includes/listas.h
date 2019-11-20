@@ -7,6 +7,7 @@ typedef struct item Item;
 typedef struct{
     Item *inicio;
     Item *fim;
+    int size;
 } Lista;
 
 // #1)
@@ -17,3 +18,6 @@ void freeList (Lista *l);
 void addItemEnd (Lista *l, int item);
 // #4)
 Item *findItem (Lista *l, int itemToFind);
+// #5)
+void addItemOrdered(Lista *l, int item);
+Item *findItemSet (Lista *l, int itemToFind);
