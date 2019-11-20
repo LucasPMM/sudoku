@@ -1,0 +1,13 @@
+./tp3 tests/in/2x2.txt
+./tp3 tests/in/2x3.txt
+./tp3 tests/in/2x4.txt
+./tp3 tests/in/2x5.txt
+./tp3 tests/in/3x3.txt
+./tp3 tests/in/3x4.txt
+./tp3 tests/in/3x5.txt
+./tp3 tests/in/4x4.txt
+./tp3 tests/in/5x5.txt
+./tp3 tests/in/6x6.txt
+./tp3 tests/in/7x7.txt
+./tp3 tests/in/8x8.txt
+./tp3 tests/in/9x9.txt

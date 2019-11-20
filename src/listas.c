@@ -55,14 +55,3 @@ Item *findItem (Lista *l, int itemToFind) {
     }
     return NULL;
 }
-
-Item *findItemSet (Lista *l, int itemToFind) {
-    Item *item = l->inicio;
-    while (item->prox != NULL) {
-        if (item->prox->item == itemToFind) {
-            return item->prox;
-        }
-        item = item->prox;
-    }
-    return l->fim;
-}

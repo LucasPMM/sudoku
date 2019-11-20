@@ -20,4 +20,3 @@ void addItemEnd (Lista *l, int item);
 Item *findItem (Lista *l, int itemToFind);
 // #5)
 void addItemOrdered(Lista *l, int item);
-Item *findItemSet (Lista *l, int itemToFind);

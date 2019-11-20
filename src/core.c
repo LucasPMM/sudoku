@@ -1,37 +1,35 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include <math.h>
 #include "../includes/core.h"
 
-#define N_TESTS 20
 #define SIZE 500
+#define N_TESTS 20
 
-// void calcAndSaveTests (double *time, int N) {
-//     int i;
-//     double sum = 0.0, average, sd;
+void calcAndSaveTests (double *time) {
+    int i;
+    double sum = 0.0, average, sd;
 
-//     // Calc average
-//     for (i = 0; i < N_TESTS; i++) {
-//         sum += time[i];
-//     }
-//     average = sum / N_TESTS;
+    // Calc average
+    for (i = 0; i < N_TESTS; i++) {
+        sum += time[i];
+    }
+    average = sum / N_TESTS;
 
-//     sum = 0.0;
-//     // Calc standard deviation
-//     for (i = 0; i < N_TESTS; i++) {
-//         double sub = fabs(time[i] - average);
-//         sum += pow(sub, 2);
-//     }
-//     sd = sqrt(sum / (N_TESTS - 1));
+    sum = 0.0;
+    // Calc standard deviation
+    for (i = 0; i < N_TESTS; i++) {
+        double sub = fabs(time[i] - average);
+        sum += pow(sub, 2);
+    }
+    sd = sqrt(sum / (N_TESTS - 1));
 
-//     // Save data on file:
-//     FILE *file = fopen("../tests/out-greedy.txt", "a+");
-//     // FILE *file = fopen("../tests/out-dynamic.txt", "a+");
-//     fprintf (file, "Sudoki NXN %d - Média: %f - Desvio Padrão: %lf\n", N, N, average, sd);
-//     fclose(file);
-// }
+    // Save data on file:
+    FILE *file = fopen("../tests/out.txt", "a+");
+    fprintf (file, " Média: %f - Desvio Padrão: %lf\n", average, sd);
+    fclose(file);
+}
 
 void printAllInformations (int N, int I, int J, int **data) {
     int i, j;
@@ -106,6 +104,7 @@ void makeEmptyGraph (Sudoku *s, int N, int I, int J, int **data) {
         makeEmptyList(&s->adjacencyList[i]);
     }
     s->data = (int*) calloc(N * N, sizeof(int));
+    s->numberOfZeros = 0;
 
     insertEdges(s, N);
     setGrids(s, N, I, J);
@@ -113,6 +112,7 @@ void makeEmptyGraph (Sudoku *s, int N, int I, int J, int **data) {
     for (i = 0; i < N; i++) {
         for (j = 0; j < N; j++) {
             insertValues(s, i, j, data[i][j], N);
+            if (!data[i][j]) { s->numberOfZeros++; }
         }
     }
 }
@@ -177,93 +177,47 @@ void setGrids(Sudoku *s, int N, int I, int J) {
 
 void calcSudoku (Sudoku *s) {
     int size = s->N * s->N, i;
-    int max_probable_vertex, max_probable;
-    int possible_solution, sudoku_complete;
-    int count = 0;
-    while(1) {
-        // printf("---INICIO---\n");
-        count ++;
-        max_probable_vertex = 0;
-        max_probable = 0;
-        possible_solution = 0;
-        sudoku_complete = 1;
+    int maxPossibilityIndex = 0, maxPossibilitySize = 0;
 
+    while(s->numberOfZeros) {
         for (i = 0; i < size; i++) {
-            if(s->data[i] == 0) {
-                sudoku_complete = 0;
-                break;
+            if (s->notPossible[i].size > maxPossibilitySize && s->data[i] == 0) {
+                maxPossibilityIndex = i;
+                maxPossibilitySize = s->notPossible[i].size;
             }
         }
 
-        if(sudoku_complete) {
-            printf("solução\n");
-            printSudoku(s);
-            return;
-        }
-
-        for (i = 0; i < size; i++) {
-            if (s->notPossible[i].size > max_probable && s->data[i] == 0) {
-                max_probable_vertex = i;
-                max_probable = s->notPossible[i].size;
-            }
-        }
         for (i = 1; i <= s->N; i++) {
-            int colour_possible = 1;
-            Item *item = findItem(&s->notPossible[max_probable_vertex], i);
-            
-            
-            
-            // printf("tentando encontrar o item %d no set na pos %d\n", i, max_probable_vertex);
-            // printf("-------------------------\n");
-            // int k;
-            // Item *begin;
-            // Item *end;
-            // Item *it;
-            // for (k = 0; k < size; k++) {
-            //     begin = s->notPossible[k].inicio->prox;
-            //     end = s->notPossible[k].fim;
-
-            //     for (it = begin; ; it = it->prox) {
-            //         printf("%d ", it->item);
-            //         if (it == end) { break; }
-            //     }
-            //     printf("\n");
-            // }
-            // printf("-------------------------\n");
-
-
-
-            if(item != NULL) {
-                colour_possible = 0;
-                // printf("entrei 1\n");
-            }
-            
-            if (colour_possible) {
-                // printf("entrei 2\n");
-                possible_solution = 1;
-                s->data[max_probable_vertex] = i;
+            Item *item = findItem(&s->notPossible[maxPossibilityIndex], i);
+            if (item == NULL) {
+                s->data[maxPossibilityIndex] = i;
         
                 Item *it;
-
-                for (it = s->adjacencyList[max_probable_vertex].inicio->prox ; ; it = it->prox) {
+                for (it = s->adjacencyList[maxPossibilityIndex].inicio->prox ; ; it = it->prox) {
                     Item *possible = findItem(&s->notPossible[it->item], i);
                     if (possible == NULL) {
                         addItemOrdered(&s->notPossible[it->item], i);
                         s->notPossible[it->item].size++;
                     }
-                    if (it == s->adjacencyList[max_probable_vertex].fim) { break; }
+                    if (it == s->adjacencyList[maxPossibilityIndex].fim) { break; }
                 }
                 break;
             }
         }
 
-        if (possible_solution == 0) {
+        if (i == s->N + 1) {
             printf("sem solução\n");
             printSudoku(s);
             return;
         }
+        
+        s->numberOfZeros--;
+        maxPossibilityIndex = 0;
+        maxPossibilitySize = 0;
     }
 
+    printf("solução\n");
+    printSudoku(s);
 }
 
 void freeGraph (Sudoku *s) {
@@ -322,14 +276,9 @@ void initProgram (FILE *file) {
         }
     }
 
-    printAllInformations(N, I, J, data);
-
     // Fill structures
     Sudoku s;
     makeEmptyGraph(&s, N, I, J, data);
-    printf("---------------------------------------------\n");
-    pringGraph(&s);
-    printf("---------------------------------------------\n");
 
     // Algorithm to calc time execution: 
     // double executionTime[N_TESTS];
@@ -340,17 +289,16 @@ void initProgram (FILE *file) {
     //     tempoInicial = clock();
 
         calcSudoku(&s);
-       
+
     //     tempoFinal = clock();
     //     executionTime[clk] = (tempoFinal- tempoInicial) * 1000.0 / CLOCKS_PER_SEC;
     // }
 
-
-    // calcAndSaveTests(executionTime, M);
+    // calcAndSaveTests(executionTime);
 
     // Free memory
     for (i = 0; i < N; i++)
         free(data[i]);
     free(data);
-    freeGraph(&s);
+    freeGraph(&s);  
 }
