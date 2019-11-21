@@ -15,7 +15,7 @@ typedef struct {
 // #1) Read all informations and calc solutions
 void initProgram (FILE *file);
 // #2) Calc average and standard deviation
-void calcAndSaveTests(double *time);
+void calcAndSaveTests (double *time, int line, int col);
 // #3) Print readed information 
 void printAllInformations (int N, int I, int J, int **data);
 // #4) Print graph information 

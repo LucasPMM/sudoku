@@ -2,12 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 #include "../includes/core.h"
 
 #define SIZE 500
 #define N_TESTS 20
 
-void calcAndSaveTests (double *time) {
+void calcAndSaveTests (double *time, int line, int col) {
     int i;
     double sum = 0.0, average, sd;
 
@@ -18,16 +19,21 @@ void calcAndSaveTests (double *time) {
     average = sum / N_TESTS;
 
     sum = 0.0;
-    // Calc standard deviation
+    // // Calc standard deviation
     for (i = 0; i < N_TESTS; i++) {
         double sub = fabs(time[i] - average);
         sum += pow(sub, 2);
     }
     sd = sqrt(sum / (N_TESTS - 1));
 
-    // Save data on file:
-    FILE *file = fopen("../tests/out.txt", "a+");
-    fprintf (file, " Média: %f - Desvio Padrão: %lf\n", average, sd);
+    char buffer [100];
+    int cx;
+
+    cx = snprintf ( buffer, 100, "tests/out/%dx%d.txt", line, col );
+
+    // // Save data on file:
+    FILE *file = fopen(buffer, "a+");
+    fprintf (file, "Média: %f - Desvio Padrão: %lf\n", average, sd);
     fclose(file);
 }
 
@@ -276,10 +282,6 @@ void initProgram (FILE *file) {
         }
     }
 
-    // Fill structures
-    Sudoku s;
-    makeEmptyGraph(&s, N, I, J, data);
-
     // Algorithm to calc time execution: 
     // double executionTime[N_TESTS];
     // int clk = 0;
@@ -288,17 +290,22 @@ void initProgram (FILE *file) {
     //     clock_t tempoFinal;
     //     tempoInicial = clock();
 
+
+        // Fill structures
+        Sudoku s;
+        makeEmptyGraph(&s, N, I, J, data);
+
         calcSudoku(&s);
+
+        // calcAndSaveTests(executionTime, J, I);
+
+        // Free memory
+        freeGraph(&s);  
 
     //     tempoFinal = clock();
     //     executionTime[clk] = (tempoFinal- tempoInicial) * 1000.0 / CLOCKS_PER_SEC;
     // }
-
-    // calcAndSaveTests(executionTime);
-
-    // Free memory
     for (i = 0; i < N; i++)
         free(data[i]);
     free(data);
-    freeGraph(&s);  
 }
