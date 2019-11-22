@@ -290,14 +290,11 @@ void initProgram (FILE *file) {
     //     clock_t tempoFinal;
     //     tempoInicial = clock();
 
-
         // Fill structures
         Sudoku s;
         makeEmptyGraph(&s, N, I, J, data);
 
         calcSudoku(&s);
-
-        // calcAndSaveTests(executionTime, J, I);
 
         // Free memory
         freeGraph(&s);  
@@ -305,6 +302,9 @@ void initProgram (FILE *file) {
     //     tempoFinal = clock();
     //     executionTime[clk] = (tempoFinal- tempoInicial) * 1000.0 / CLOCKS_PER_SEC;
     // }
+
+    // calcAndSaveTests(executionTime, J, I);
+
     for (i = 0; i < N; i++)
         free(data[i]);
     free(data);
