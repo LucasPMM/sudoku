@@ -1,0 +1,10 @@
+./tp3 tests/3x3/1_3x3.txt
+./tp3 tests/3x3/2_3x3.txt
+./tp3 tests/3x3/3_3x3.txt
+./tp3 tests/3x3/4_3x3.txt
+./tp3 tests/3x3/5_3x3.txt
+./tp3 tests/3x3/6_3x3.txt
+./tp3 tests/3x3/7_3x3.txt
+./tp3 tests/3x3/8_3x3.txt
+./tp3 tests/3x3/9_3x3.txt
+./tp3 tests/3x3/10_3x3.txt

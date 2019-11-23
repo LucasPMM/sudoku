@@ -6,7 +6,7 @@
 #include "../includes/core.h"
 
 #define SIZE 500
-#define N_TESTS 20
+#define N_TESTS 100
 
 void calcAndSaveTests (double *time, int line, int col) {
     int i;
@@ -26,14 +26,15 @@ void calcAndSaveTests (double *time, int line, int col) {
     }
     sd = sqrt(sum / (N_TESTS - 1));
 
-    char buffer [100];
-    int cx;
+    // char buffer [100];
+    // int cx;
 
-    cx = snprintf ( buffer, 100, "tests/out/%dx%d.txt", line, col );
+    // cx = snprintf ( buffer, 100, "tests/out/%dx%d.txt", line, col );
 
-    // // Save data on file:
-    FILE *file = fopen(buffer, "a+");
-    fprintf (file, "Média: %f - Desvio Padrão: %lf\n", average, sd);
+    // Save data on file:
+    // FILE *file = fopen(buffer, "a+");
+    FILE *file = fopen("tests/out.txt", "a+");
+    fprintf (file, "Sudoku %dx%d Média: %f - Desvio Padrão: %lf\n", line, col, average, sd);
     fclose(file);
 }
 

@@ -1,0 +1,10 @@
+./tp3 tests/4x4/1_4x4.txt
+./tp3 tests/4x4/2_4x4.txt
+./tp3 tests/4x4/3_4x4.txt
+./tp3 tests/4x4/4_4x4.txt
+./tp3 tests/4x4/5_4x4.txt
+./tp3 tests/4x4/6_4x4.txt
+./tp3 tests/4x4/7_4x4.txt
+./tp3 tests/4x4/8_4x4.txt
+./tp3 tests/4x4/9_4x4.txt
+./tp3 tests/4x4/10_4x4.txt

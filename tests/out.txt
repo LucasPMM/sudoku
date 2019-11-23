@@ -1,0 +1,10 @@
+Sudoku 2x2 Média: 0.036340 - Desvio Padrão: 0.006418
+Sudoku 2x2 Média: 0.068580 - Desvio Padrão: 0.019756
+Sudoku 2x2 Média: 0.070200 - Desvio Padrão: 0.022111
+Sudoku 2x2 Média: 0.067100 - Desvio Padrão: 0.022281
+Sudoku 2x2 Média: 0.062020 - Desvio Padrão: 0.015228
+Sudoku 2x2 Média: 0.031990 - Desvio Padrão: 0.005986
+Sudoku 2x2 Média: 0.047640 - Desvio Padrão: 0.023249
+Sudoku 2x2 Média: 0.025930 - Desvio Padrão: 0.011237
+Sudoku 2x2 Média: 0.020420 - Desvio Padrão: 0.007489
+Sudoku 2x2 Média: 0.023150 - Desvio Padrão: 0.006303
