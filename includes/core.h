@@ -32,7 +32,7 @@ void calcSudoku (Sudoku *s);
 void makeEmptyGraph (Sudoku *s, int N, int I, int J, int **data);
 // #4) Insert edges between vertex 
 void insertEdges (Sudoku *s, int N);
-// #5) Insert edges between vertex inside grid 
+// #5) Insert edges between vertex inside block 
 void setGrids(Sudoku *s, int N, int I, int J);
 // #6) Insert readed values on graph 
 void insertValues (Sudoku *s, int row, int column, int value, int N);

@@ -98,6 +98,7 @@ void pringGraph(Sudoku *s) {
     printf("\n");
 }
 
+// Starts to build the graph:
 void makeEmptyGraph (Sudoku *s, int N, int I, int J, int **data) {
     int i, j;
     s->N = N;
@@ -116,6 +117,7 @@ void makeEmptyGraph (Sudoku *s, int N, int I, int J, int **data) {
     insertEdges(s, N);
     setGrids(s, N, I, J);
 
+    // Insert initial values for sudoku
     for (i = 0; i < N; i++) {
         for (j = 0; j < N; j++) {
             insertValues(s, i, j, data[i][j], N);
@@ -135,7 +137,7 @@ void insertValues (Sudoku *s, int row, int column, int value, int N) {
     if(value != 0) {
         Item *it;
         for (it = begin;  ; it = it->prox) {
-            // Only add non-repetitive numbers
+            // Only add non-repetitive numbers in order
             Item *item = findItem(&s->notPossible[it->item], value);
             if (item == NULL) {
                 addItemOrdered(&s->notPossible[it->item], value);
@@ -147,6 +149,7 @@ void insertValues (Sudoku *s, int row, int column, int value, int N) {
 }
 
 void insertEdges (Sudoku *s, int N) {
+    // Adding edges between all elements at the same line and column
     int i, size = N * N;
     for (i = 0; i < size; i++) {
         int actualLine = (i / N), column;
@@ -164,6 +167,7 @@ void insertEdges (Sudoku *s, int N) {
 }
 
 void setGrids(Sudoku *s, int N, int I, int J) {
+    // Adding edges between vertex at the same block
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             int source = i * N + j;
@@ -186,7 +190,9 @@ void calcSudoku (Sudoku *s) {
     int size = s->N * s->N, i;
     int maxPossibilityIndex = 0, maxPossibilitySize = 0;
 
+    // Run loop while sudoku has 0's or when sudoku rules are broken
     while(s->numberOfZeros) {
+        // Find the vertex index that has the least color possibilities
         for (i = 0; i < size; i++) {
             if (s->notPossible[i].size > maxPossibilitySize && s->data[i] == 0) {
                 maxPossibilityIndex = i;
@@ -202,6 +208,7 @@ void calcSudoku (Sudoku *s) {
                 Item *it;
                 for (it = s->adjacencyList[maxPossibilityIndex].inicio->prox ; ; it = it->prox) {
                     Item *possible = findItem(&s->notPossible[it->item], i);
+                    // If we find the color, we fill in the vertex. We always take the first vector option
                     if (possible == NULL) {
                         addItemOrdered(&s->notPossible[it->item], i);
                         s->notPossible[it->item].size++;
@@ -212,6 +219,7 @@ void calcSudoku (Sudoku *s) {
             }
         }
 
+        // No more color possibilities for vertex fill
         if (i == s->N + 1) {
             printf("sem solução\n");
             printSudoku(s);

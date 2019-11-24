@@ -55,3 +55,5 @@ Item *findItem (Lista *l, int itemToFind) {
     }
     return NULL;
 }
+
+// Funções desenvolvidas de acordo com o material da disciplina de Estrutura de Dados
